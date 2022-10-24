@@ -9,6 +9,12 @@ import { addresses as tokenGate_mainnet } from "./addresses/tokenGate_mainnet";
 import { addresses as sample_goerli } from "./addresses/sample_goerli";
 import { addresses as sample_localhost } from "./addresses/sample_localhost";
 import { addresses as nouns_goerli } from "./addresses/nouns_goerli";
+import { addresses as store_goerli } from "./addresses/addresses_goerli";
+import { addresses as store_localhost } from "./addresses/addresses_localhost";
+import { addresses as store_mainnet } from "./addresses/addresses_mainnet";
+import { addresses as bitcoin_goerli } from "./addresses/bitcoin_goerli";
+import { addresses as bitcoin_localhost } from "./addresses/bitcoin_localhost";
+import { addresses as bitcoin_mainnet } from "./addresses/bitcoin_mainnet";
 
 export const addresses: any = {
   svgHelper: {
@@ -26,6 +32,11 @@ export const addresses: any = {
     localhost: splatter_localhost.splatterArtAddress,
     mainnet: splatter_mainnet.splatterArtAddress,
   },
+  splatterToken: {
+    goerli: splatter_goerli.splatterToken,
+    mainnet: splatter_mainnet.splatterToken,
+    localhost: splatter_localhost.splatterToken,
+  },
   snow: {
     goerli: snow_goerli.snowAddress,
     localhost: snow_localhost.snowAddress,
@@ -41,10 +52,42 @@ export const addresses: any = {
   },
   nouns: {
     goerli: nouns_goerli.providerAddress,
-    localhost: nouns_goerli.providerAddress, // hack
+  },
+  nounsArt: {
+    goerli: nouns_goerli.nounsArt,
   },
   sample: {
     goerli: sample_goerli.providerAddress,
     localhost: sample_localhost.providerAddress,
+  },
+  assetStore: {
+    goerli: store_goerli.storeAddress,
+    mainnet: store_mainnet.storeAddress,
+    localhost: store_localhost.storeAddress,
+  },
+  bitcoin: {
+    goerli: bitcoin_goerli.bitcoinArtProvider,
+    localhost: bitcoin_localhost.bitcoinArtProvider,
+    mainnet: bitcoin_mainnet.bitcoinArtProvider,
+  },
+  bitcoinToken: {
+    goerli: bitcoin_goerli.bitcoinToken,
+    localhost: bitcoin_localhost.bitcoinToken,
+    mainnet: bitcoin_mainnet.bitcoinToken,
+  },
+  assetStoreProvider: {
+    goerli: bitcoin_goerli.assetStoreProvider,
+    localhost: bitcoin_localhost.assetStoreProvider,
+    mainnet: bitcoin_mainnet.assetStoreProvider,
+  },
+  coinProvider: {
+    goerli: bitcoin_goerli.coinProvider,
+    localhost: bitcoin_localhost.coinProvider,
+    mainnet: bitcoin_mainnet.coinProvider,
+  },
+  colorSchemes: {
+    goerli: bitcoin_goerli.colorSchemes,
+    localhost: bitcoin_localhost.colorSchemes,
+    mainnet: bitcoin_mainnet.colorSchemes,
   },
 };

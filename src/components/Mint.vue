@@ -1,5 +1,6 @@
 <template>
   <div>
+    <p>Available: {{ `${mintLimit - totalSupply}/${mintLimit}` }}</p>
     <NetworkGate :expectedNetwork="chainId">
       <p>Wallet: {{ wallet }}</p>
       <p>Network: {{ network }}</p>
@@ -7,18 +8,23 @@
         You have {{ totalBalance }} whitelist token(s).
       </p>
       <p>Price: {{ mintPriceString }}</p>
-      <p>Supply: {{ `${totalSupply}/${mintLimit}` }}</p>
       <div v-if="totalSupply < mintLimit">
-        <p v-if="isMinting" class="mt-4 mb-4 bg-slate-200 pl-4">
-          Processing...
-        </p>
-        <button
-          v-else
-          @click="mint"
-          class="mt-2 inline-block rounded bg-green-600 px-6 py-2.5 leading-tight text-white shadow-md transition duration-150 ease-in-out hover:bg-green-700 hover:shadow-lg focus:bg-green-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-green-800 active:shadow-lg"
-        >
-          {{ $t("mint.mint") }}
-        </button>
+        <div v-if="restricted && totalBalance == 0" class="text-red-500">
+          Sorry, minting is available only to "{{ restricted }}" NFT holders at
+          this moment.
+        </div>
+        <div v-else>
+          <p v-if="isMinting" class="mt-4 mb-4 bg-slate-200 pl-4">
+            Processing...
+          </p>
+          <button
+            v-else
+            @click="mint"
+            class="mt-2 inline-block rounded bg-green-600 px-6 py-2.5 leading-tight text-white shadow-md transition duration-150 ease-in-out hover:bg-green-700 hover:shadow-lg focus:bg-green-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-green-800 active:shadow-lg"
+          >
+            {{ $t("mint.mint") }}
+          </button>
+        </div>
       </div>
       <div v-else>
         <button
@@ -68,7 +74,13 @@ interface Token {
 }
 
 export default defineComponent({
-  props: ["network", "tokenAddress", "tokenGated"],
+  props: [
+    "network",
+    "tokenAddress",
+    "tokenGated",
+    "tokenGateAddress",
+    "restricted",
+  ],
   components: {
     NetworkGate,
     References,
@@ -85,41 +97,46 @@ export default defineComponent({
     );
     const isMinting = ref<boolean>(false);
 
+    const checkTokenGate = async () => {
+      console.log("### calling totalBalanceOf");
+      if (props.tokenGated) {
+        const [result] = await tokenGate.functions.balanceOf(
+          store.state.account
+        );
+        totalBalance.value = result.toNumber();
+      }
+      const [value] = await contractRO.functions.mintPriceFor(
+        store.state.account
+      );
+      mintPrice.value = value;
+      console.log("*** checkTokenGate", weiToEther(mintPrice.value));
+    };
+
     const account = computed(() => {
       if (store.state.account == null) {
         return null;
       }
-      const checkTokenGate = async () => {
-        console.log("### calling totalBalanceOf");
-        if (props.tokenGated) {
-          const [result] = await tokenGate.functions.balanceOf(
-            store.state.account
-          );
-          totalBalance.value = result.toNumber();
-        }
-        const [value] = await contractRO.functions.mintPriceFor(
-          store.state.account
-        );
-        mintPrice.value = value;
-        console.log("*** checkTokenGate", weiToEther(mintPrice.value));
-      };
       checkTokenGate();
       return store.state.account;
     });
     const wallet = computed(() => displayAddress(account.value));
 
     const chainId = ChainIdMap[props.network];
+    const alchemyKey = process.env.VUE_APP_ALCHEMY_API_KEY;
     const provider =
       props.network == "localhost"
         ? new ethers.providers.JsonRpcProvider()
-        : new ethers.providers.AlchemyProvider(props.network);
+        : alchemyKey
+        ? new ethers.providers.AlchemyProvider(props.network, alchemyKey)
+        : new ethers.providers.InfuraProvider(props.network);
+
     const contractRO = new ethers.Contract(
       props.tokenAddress,
       ProviderTokenEx.wabi.abi,
       provider
     );
     const tokenGate = new ethers.Contract(
-      addresses.tokenGate[props.network],
+      props.tokenGateAddress, //
       ITokenGate.wabi.abi,
       provider
     );
@@ -197,6 +214,7 @@ export default defineComponent({
         console.log("mint:tx");
         const result = await tx.wait();
         console.log("mint:gasUsed", result.gasUsed.toNumber());
+        await checkTokenGate();
       } catch (e) {
         console.error(e);
       }

@@ -13,8 +13,8 @@ import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
 import "@openzeppelin/contracts/utils/Strings.sol";
 import '@openzeppelin/contracts/interfaces/IERC165.sol';
 import { Base64 } from 'base64-sol/base64.sol';
-import { IAssetProvider } from './interfaces/IAssetProvider.sol';
-import { INounsDescriptor, INounsSeeder } from './external/nouns/INounsDescriptor.sol';
+import "assetprovider.sol/IAssetProvider.sol";
+import { INounsDescriptor, INounsSeeder } from '../external/nouns/INounsDescriptor.sol';
 
 // IAssetProvider wrapper for composability
 contract NounsAssetProvider is IAssetProvider, IERC165, Ownable {

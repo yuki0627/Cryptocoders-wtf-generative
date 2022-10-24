@@ -10,34 +10,36 @@
 pragma solidity ^0.8.6;
 
 import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
-import { IAssetProvider } from './interfaces/IAssetProvider.sol';
-import { IAssetProviderEx } from './interfaces/IAssetProviderEx.sol';
+import "assetprovider.sol/IAssetProvider.sol";
 import "randomizer.sol/Randomizer.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import '@openzeppelin/contracts/interfaces/IERC165.sol';
 import "hardhat/console.sol";
 
 /**
- * MultiplexProvider create a new asset provider from another asset provider,
+ * MultiRepeatProvider create a new asset provider from another asset provider,
  * which draws multiple assets with the same set of provider-specific properties.
  */
-contract MultiplexProvider is IAssetProvider, IERC165, Ownable {
+contract MultiRepeatProvider is IAssetProvider, IERC165, Ownable {
   using Strings for uint32;
   using Strings for uint256;
   using Randomizer for Randomizer.Seed;
 
   string providerKey;
   string providerName;
+  uint256 immutable providerAssetId;
 
   uint constant schemeCount = 15;
   uint constant colorCount = 5;
+  uint assetCount = 3; // LATER: Make it configurable
 
-  IAssetProviderEx public provider;
+  IAssetProvider public provider;
 
-  constructor(IAssetProviderEx _provider, string memory _key, string memory _name) {
+  constructor(IAssetProvider _provider, uint256 _assetId, string memory _key, string memory _name) {
     provider = _provider;
     providerKey = _key;
     providerName = _name;
+    providerAssetId = _assetId;
   }
 
   function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
@@ -111,33 +113,49 @@ contract MultiplexProvider is IAssetProvider, IERC165, Ownable {
 
     string[] memory scheme;
     (seed, scheme) = getColorScheme(seed, schemeIndex);
-
-    uint256 props;
-    (seed, props) = provider.generateRandomProps(seed);
     
-    bytes memory defs;
-    bytes memory body;
+    string memory body;
+    string memory defs;
+    string[] memory tags = new string[](assetCount);
+    uint i;
+    for (i=0; i < assetCount; i++) {
+      (body, tags[i]) = provider.generateSVGPart(providerAssetId + i);
+      defs = string(abi.encodePacked(defs,
+        body,    
+        '<g id="', tags[i], '_coin">'
+        '<circle cx="511" cy="511" r="650" />'
+        '<use href="#', tags[i], '" />'
+        '</g>'));
+      tags[i] = string(abi.encodePacked(tags[i], '_coin'));
+    }
+
     tag = string(abi.encodePacked(providerKey, _assetId.toString()));
-    string memory tagPart;
+    body = "";
 
     seed = Randomizer.Seed(_assetId, 0);
-    for (uint i = 0; i < scheme.length * 10; i++) {
-      tagPart = string(abi.encodePacked(tag, "_", i.toString()));
-      (seed, svgPart) = provider.generateSVGPartWithProps(seed, props, tagPart);
-      defs = abi.encodePacked(defs, svgPart);
-      body = abi.encodePacked(body, '<use href="#', tagPart, '" fill="#', scheme[i / 10]);
+    for (i = 0; i < scheme.length * 10; i++) {
+      body = string(abi.encodePacked(body, '<use href="#', tags[i % assetCount], '" fill="#', scheme[i / 10]));
 
       uint size;
-      (seed, size) = seed.random(400);
-      size += 100;
+      uint size2;
+      (seed, size) = seed.random(15);
+      (seed, size2) = seed.random(15);
+      size = 72 + size * size2;
+      string memory zero;
+      if (size < 100) {
+        zero = '0';
+      }
       uint margin = (1024 - 1024 * size / 1000) / 2;
       uint x;
       uint y;
       (seed, x) = seed.randomize(margin, 100);
       (seed, y) = seed.randomize(margin, 100);
-      body = abi.encodePacked(body, '" transform="translate(',
+      uint angle;
+      (seed, angle) = seed.random(60);
+      angle *= 60;
+      body = string(abi.encodePacked(body, '" transform="translate(',
         x.toString(), ',', y.toString(),
-        ') scale(0.',size.toString(),', 0.',size.toString(),')" />\n');
+        ') scale(0.',zero, size.toString(),', 0.',zero, size.toString(),') rotate(',angle.toString(),', 512, 512)" />\n'));
     }
 
     svgPart = string(abi.encodePacked(

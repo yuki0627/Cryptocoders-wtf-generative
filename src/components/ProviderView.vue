@@ -31,7 +31,8 @@ export default defineComponent({
     const route = useRoute();
     const network =
       typeof route.query.network == "string" ? route.query.network : "goerli";
-    console.log("*** network", network);
+    const alchemyKey = process.env.VUE_APP_ALCHEMY_API_KEY;
+    console.log("*** network", network, alchemyKey);
 
     const providerAddress = addresses[props.assetProvider][network];
     const svgHelperAddress = addresses["svgHelper"][network];
@@ -39,7 +40,9 @@ export default defineComponent({
     const provider =
       network == "localhost"
         ? new ethers.providers.JsonRpcProvider()
-        : new ethers.providers.AlchemyProvider(network);
+        : alchemyKey
+        ? new ethers.providers.AlchemyProvider(network, alchemyKey)
+        : new ethers.providers.InfuraProvider(network);
     const assetProvider = new ethers.Contract(
       providerAddress,
       IAssetProvider.wabi.abi,
@@ -59,6 +62,7 @@ export default defineComponent({
           providerAddress,
           i
         );
+        // console.log("svgPart", svgPart);
         const [traits] = await assetProvider.functions.generateTraits(i);
         console.log("gas", gas.toNumber(), traits);
         const image = svgImageFromSvgPart(svgPart, tag, sampleColors[i]);

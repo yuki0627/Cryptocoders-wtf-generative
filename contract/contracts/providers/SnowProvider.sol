@@ -10,9 +10,9 @@
 pragma solidity ^0.8.6;
 
 import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
-import { IAssetProvider } from './interfaces/IAssetProvider.sol';
-import { IAssetProviderEx } from './interfaces/IAssetProviderEx.sol';
-import { ISVGHelper } from './interfaces/ISVGHelper.sol';
+import "assetprovider.sol/IAssetProvider.sol";
+import { IAssetProviderEx } from '../interfaces/IAssetProviderEx.sol';
+import "assetprovider.sol/ISVGHelper.sol";
 import "randomizer.sol/Randomizer.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import '@openzeppelin/contracts/interfaces/IERC165.sol';

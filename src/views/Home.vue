@@ -3,17 +3,22 @@
     <h1 class="mt-2 mb-2 text-xl font-bold">Fully On-Chain Generative Art</h1>
     <p class="mb-2">
       This is a website for developers who are interested in
-      <b>on-chain generative art</b>, which means
+      <b>fully on-chain generative art</b>, which means
       <u>you write Solidity code to dynamically generate art in SVG</u>.
     </p>
     <p class="mb-2">
       Unlike images stored on HTTP servers or IPFS, on-chain generative arts are
-      truly decentralized and composable. It can even generate revenue
-      autonomously (we will launch a
+      truly decentralized and composable (i.e., re-use image from other smart
+      contracts). It can even generate revenue autonomously (we will launch a
       <b>decentralized autonomous marketplace</b> for generative arts soon).
     </p>
     <p class="mb-2">
-      Because this is such a new field, I am going to guide you to get there
+      Traditional on-chain NFTs, such as Nouns, had very poor graphics (see
+      below), and this project was born to solve this problem.
+    </p>
+    <img class="mb-4" src="https://i.imgur.com/R9aTx5N.png" />
+    <p class="mb-2">
+      Because this is such a new field, we are going to guide you to get there
       step by step.
     </p>
     <h1 class="mt-2 mb-2 text-xl font-bold">Architecture</h1>
@@ -64,8 +69,9 @@
     <h1 class="mt-2 mb-2 text-xl font-bold">Porting it to Solidity</h1>
     <p class="mb-2">
       The Soidity version of Splatter is avaiable at
-      <code class="bg-gray-200">contract/contracts/SplatterProvider.sol</code>.
-      Please compare it to TypeScript version. Although there are some
+      <code class="bg-gray-200"
+        >contract/contracts/providers/SplatterProvider.sol</code
+      >. Please compare it to TypeScript version. Although there are some
       differences because of languages, they are build with the same algorithm
       and similar libraries.
     </p>
@@ -98,6 +104,7 @@ export default defineComponent({
     References,
   },
   setup() {
+    console.log("*** env", process.env.VUE_APP_ALCHEMY_API_KEY);
     return {};
   },
 });

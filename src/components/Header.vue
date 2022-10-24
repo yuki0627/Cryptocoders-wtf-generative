@@ -16,6 +16,9 @@
       <router-link :to="localizedUrl('/splatter')" class="text-md">
         Splatter
       </router-link>
+      <router-link :to="localizedUrl('/bitcoin')" class="text-md">
+        Bitcoin
+      </router-link>
       <router-link :to="localizedUrl('/snow')" class="text-md">
         Snow
       </router-link>
