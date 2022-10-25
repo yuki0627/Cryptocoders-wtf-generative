@@ -4,6 +4,7 @@ import Blank from "../components/Blank.vue";
 import NotFound from "../components/NotFound.vue";
 
 import Home from "../views/Home.vue";
+import Semi from "../views/Semi.vue";
 import Splatter from "../views/Splatter.vue";
 import Snow from "../views/Snow.vue";
 import Nouns from "../views/Nouns.vue";
@@ -14,6 +15,10 @@ const routeChildren: Array<RouteRecordRaw> = [
   {
     path: "",
     component: Home,
+  },
+  {
+    path: "semi",
+    component: Semi,
   },
   {
     path: "splatter",

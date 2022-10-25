@@ -34,7 +34,11 @@ export default defineComponent({
     const alchemyKey = process.env.VUE_APP_ALCHEMY_API_KEY;
     console.log("*** network", network, alchemyKey);
 
-    const providerAddress = addresses[props.assetProvider][network];
+    // const providerAddress = addresses[props.assetProvider][network];
+    // const providerAddress = "0xA084b3a45044366A6af2C0521f51Ad7948e6C7E2" //coin
+    // const providerAddress = "0xEC361A1dbAa28fC36162c65E6b65D9a60138b994" //coinArt
+    const providerAddress = "0x7C5Ea12E7cFf945857fC91b81329Fe41b845678e" //splatter
+    // const providerAddress = "0xc050629cb7E54a88e0cB3Ab504600F5dfca60aE7" //splatterArt
     const svgHelperAddress = addresses["svgHelper"][network];
     console.log("*** address", providerAddress, svgHelperAddress);
     const provider =
